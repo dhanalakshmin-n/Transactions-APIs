@@ -2,8 +2,14 @@ package com.dhana.transaction_analytics.service;
 
 import com.dhana.transaction_analytics.dto.*;
 import com.dhana.transaction_analytics.entity.Transaction;
+import com.dhana.transaction_analytics.enums.TransactionStatus;
+import com.dhana.transaction_analytics.enums.TransactionType;
 import org.springframework.stereotype.Service;
 import com.dhana.transaction_analytics.repository.TransactionRepository;
+
+import java.math.BigInteger;
+import java.util.List;
+
 
 @Service
 public class TransactionServiceImpl
@@ -34,6 +40,45 @@ public class TransactionServiceImpl
                 .accountNumber(saved.getAccountNumber())
                 .amount(saved.getAmount())
                 .build();
+    }
+
+    @Override
+    public TransactionSummaryDto getSummary() {
+
+        List<Transaction> transactions =
+            repository.findAll();
+
+        BigInteger totalCredit =
+                transactions.stream()
+                        .filter(t ->
+                                t.getType() ==
+                                        TransactionType.CREDIT)
+                        .map(Transaction::getAmount)
+                        .reduce(BigInteger.ZERO,
+                                BigInteger::add);
+
+        BigInteger totalDebit =
+                transactions.stream()
+                        .filter(t ->
+                                t.getType() ==
+                                TransactionType.DEBIT)
+                        .map(Transaction::getAmount)
+                        .reduce(BigInteger.ZERO,
+                                BigInteger::add);
+
+        long failedCount =
+                transactions.stream()
+                        .filter(t ->
+                                t.getStatus() ==
+                                        TransactionStatus.FAILURE)
+                        .count();
+
+        return new TransactionSummaryDto(
+                totalCredit,
+                totalDebit,
+                failedCount
+        );
+
     }
 
 }

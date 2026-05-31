@@ -14,5 +14,5 @@ public class TransactionSummaryDto {
 
     private BigInteger totalDebit;
 
-    private BigInteger failedTransactions;
+    private Long failedTransactions;
 }

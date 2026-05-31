@@ -5,5 +5,5 @@ public interface TransactionService {
     TransactionResponseDto save(
             TransactionRequestDto dto);
 
-   // TransactionSummaryDto getSummary();
+    TransactionSummaryDto getSummary();
 }
